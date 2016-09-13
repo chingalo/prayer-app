@@ -34,7 +34,7 @@ var SqlLite = (function () {
                     { value: 'value', type: 'TEXT' }
                 ],
                 fields: "fields",
-                filter: "filters"
+                filter: ""
             },
             constants4: {
                 columns: [

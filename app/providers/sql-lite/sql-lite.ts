@@ -27,7 +27,7 @@ export class SqlLite {
         {value: 'value', type: 'TEXT'}
       ],
       fields : "fields",
-      filter:"filters"
+      filter:""
     },
     constants4: {
       columns: [
