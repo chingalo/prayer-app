@@ -55,34 +55,30 @@ var SqlLite = (function () {
             var promises = [];
             var tableNames = Object.keys(self.dataBaseStructure);
             tableNames.forEach(function (tableName) {
-                console.log('tableNames :: ' + tableName);
                 promises.push(self.createTable(tableName, databaseName).then(function () {
-                    console.log('success :: ' + tableName);
+                    resolve();
                 }).catch(function (err) {
-                    console.log('err :: ' + JSON.stringify(err) + ' :: ' + tableName);
+                    reject();
                 }));
             });
             Rx_1.Observable.forkJoin(promises).subscribe(function () {
-                console.log('Success');
                 resolve();
             }, function (err) {
-                console.log('Fail ' + JSON.stringify(err));
                 reject();
             });
         });
     };
     SqlLite.prototype.openDatabase = function (databaseName) {
         return new Promise(function (resolve, reject) {
+            databaseName = databaseName + '.db';
             var db = new ionic_native_1.SQLite();
             db.openDatabase({
-                name: 'data.db',
+                name: databaseName,
                 location: 'default'
             }).then(function () {
-                console.log('success');
-                resolve('success');
+                resolve();
             }, function (err) {
-                reject('Unable to open database: ' + JSON.stringify(err));
-                console.log('Unable to open database: ' + err);
+                reject();
             });
         });
     };
@@ -115,6 +111,113 @@ var SqlLite = (function () {
                 reject();
             });
         });
+    };
+    SqlLite.prototype.insertDataOnTable = function (tableName, fieldsValues, databaseName) {
+        var self = this;
+        databaseName = databaseName + '.db';
+        var columns = self.dataBaseStructure[tableName].columns;
+        var columnNames = "";
+        var questionMarks = "";
+        var values = [];
+        columns.forEach(function (column, index) {
+            var columnValue;
+            var columnName = column.value;
+            columnNames += columnName;
+            if (fieldsValues[columnName]) {
+                columnValue = fieldsValues[columnName];
+            }
+            questionMarks += "?";
+            if ((index + 1) < columns.length) {
+                columnNames += ',';
+                questionMarks += ',';
+            }
+            if (column.type != "LONGTEXT") {
+                if (columnValue == undefined) {
+                    columnValue = 0;
+                }
+                values.push(columnValue);
+            }
+            else {
+                values.push(JSON.stringify(columnValue));
+            }
+        });
+        var query = "INSERT OR REPLACE INTO " + tableName + " (" + columnNames + ") VALUES (" + questionMarks + ")";
+        var db = new ionic_native_1.SQLite();
+        return new Promise(function (resolve, reject) {
+            db.openDatabase({ name: databaseName, location: 'default' }).then(function () {
+                db.executeSql(query, values).then(function (success) {
+                    resolve();
+                }, function (err) {
+                    reject();
+                });
+            }, function (err) {
+                reject();
+            });
+        });
+    };
+    SqlLite.prototype.getDataFromTableByAttributes = function (tableName, attribute, attributesValuesArray, databaseName) {
+        var self = this;
+        databaseName = databaseName + '.db';
+        var columns = self.dataBaseStructure[tableName].columns;
+        var query = "SELECT * FROM " + tableName + " WHERE " + attribute + " IN (";
+        var inClauseValues = "";
+        attributesValuesArray.forEach(function (attributesValue, index) {
+            inClauseValues += "'" + attributesValue + "'";
+            if ((index + 1) < attributesValuesArray.length) {
+                inClauseValues += ',';
+            }
+        });
+        query += inClauseValues;
+        query += ")";
+        var db = new ionic_native_1.SQLite();
+        return new Promise(function (resolve, reject) {
+            db.openDatabase({ name: databaseName, location: 'default' }).then(function () {
+                db.executeSql(query, []).then(function (result) {
+                    resolve(self.formatQueryReturnResult(result, columns));
+                }, function (err) {
+                    reject();
+                });
+            }, function (err) {
+                reject();
+            });
+        });
+    };
+    SqlLite.prototype.getAllDataFromTable = function (tableName, databaseName) {
+        var self = this;
+        databaseName = databaseName + '.db';
+        var columns = self.dataBaseStructure[tableName].columns;
+        var query = "SELECT * FROM " + tableName + ";";
+        var db = new ionic_native_1.SQLite();
+        return new Promise(function (resolve, reject) {
+            db.openDatabase({ name: databaseName, location: 'default' }).then(function () {
+                db.executeSql(query, []).then(function (result) {
+                    resolve(self.formatQueryReturnResult(result, columns));
+                }, function (err) {
+                    reject();
+                });
+            }, function (err) {
+                reject();
+            });
+        });
+    };
+    SqlLite.prototype.formatQueryReturnResult = function (result, columns) {
+        var len = result.rows.length;
+        var data = [];
+        for (var i = 0; i < len; i++) {
+            var row = {};
+            var currentRow = result.rows.item(i);
+            columns.forEach(function (column) {
+                var columnName = column.value;
+                if (column.type != "LONGTEXT") {
+                    row[columnName] = currentRow[columnName];
+                }
+                else {
+                    row[columnName] = eval("(" + currentRow[columnName] + ")");
+                }
+            });
+            data.push(row);
+        }
+        return data;
     };
     SqlLite = __decorate([
         core_1.Injectable(), 

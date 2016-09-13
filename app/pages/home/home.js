@@ -14,10 +14,20 @@ var HomePage = (function () {
     function HomePage(navCtrl, sqllite) {
         this.navCtrl = navCtrl;
         this.sqllite = sqllite;
+        this.data = {};
         this.openDatabase();
     }
     HomePage.prototype.openDatabase = function () {
-        this.sqllite.generateTables('demo').then(function () { });
+        var _this = this;
+        this.sqllite.getAllDataFromTable('person', 'demo').then(function (data) {
+            _this.data['person'] = data;
+        });
+        this.sqllite.getDataFromTableByAttributes('constants', 'id', ['0'], 'demo').then(function (data) {
+            _this.data['constants'] = data;
+        });
+        this.sqllite.getAllDataFromTable('constants4', 'demo').then(function (data) {
+            _this.data['constants4'] = data;
+        });
     };
     HomePage = __decorate([
         core_1.Component({

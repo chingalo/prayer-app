@@ -7,11 +7,21 @@ import {SqlLite} from "../../providers/sql-lite/sql-lite";
   providers: [SqlLite]
 })
 export class HomePage {
+
+  private data :any = {};
   constructor(private navCtrl: NavController,private sqllite:SqlLite) {
     this.openDatabase();
   }
 
   openDatabase(){
-    this.sqllite.generateTables('demo').then(()=>{});
+    this.sqllite.getAllDataFromTable('person','demo').then(data=>{
+      this.data['person'] = data;
+    });
+    this.sqllite.getDataFromTableByAttributes('constants','id',['0'],'demo').then(data=>{
+      this.data['constants'] = data;
+    });
+    this.sqllite.getAllDataFromTable('constants4','demo').then(data=>{
+      this.data['constants4'] = data;
+    });
   }
 }

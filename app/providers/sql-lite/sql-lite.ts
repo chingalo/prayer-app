@@ -11,8 +11,6 @@ import {Observable} from 'rxjs/Rx';
 @Injectable()
 export class SqlLite {
 
-  private db: any;
-
   private dataBaseStructure: any= {
     person : {
       columns : [
@@ -54,21 +52,18 @@ export class SqlLite {
       let promises = [];
       let tableNames = Object.keys(self.dataBaseStructure);
       tableNames.forEach((tableName: any) => {
-        console.log('tableNames :: ' + tableName);
         promises.push(self.createTable(tableName,databaseName).then(()=>{
-            console.log('success :: ' + tableName);
+          resolve();
           }).catch(err=>{
-            console.log('err :: ' + JSON.stringify(err) + ' :: '  + tableName);
+            reject();
           })
         );
       });
-      Observable.forkJoin(promises).subscribe(
-        () => {
-          console.log('Success');
+
+      Observable.forkJoin(promises).subscribe(() => {
           resolve()
         },
         err => {
-          console.log('Fail ' +JSON.stringify(err));
           reject();
         }
       );
@@ -77,16 +72,15 @@ export class SqlLite {
 
   openDatabase(databaseName){
     return new Promise(function(resolve, reject) {
+      databaseName = databaseName + '.db';
       let db = new SQLite();
       db.openDatabase({
-        name: 'data.db',
+        name: databaseName,
         location: 'default'
       }).then(() => {
-        console.log('success');
-        resolve('success');
+        resolve();
       }, (err) => {
-        reject('Unable to open database: ' + JSON.stringify(err));
-        console.log('Unable to open database: ' + err);
+        reject();
       });
     });
 
@@ -95,6 +89,7 @@ export class SqlLite {
   createTable(tableName,databaseName){
     let self = this;
     databaseName = databaseName + '.db';
+
     return new Promise(function(resolve, reject) {
       let query = 'CREATE TABLE IF NOT EXISTS ' + tableName + ' (';
       let columns = self.dataBaseStructure[tableName].columns;
@@ -120,6 +115,126 @@ export class SqlLite {
         reject();
       });
     });
+  }
+
+  insertDataOnTable(tableName, fieldsValues,databaseName){
+    let self = this;
+    databaseName = databaseName + '.db';
+    let columns = self.dataBaseStructure[tableName].columns;
+    let columnNames = "";
+    let questionMarks = "";
+    let values = [];
+
+    columns.forEach((column: any,index:any)=>{
+      let columnValue :any;
+      let columnName = column.value;
+      columnNames += columnName;
+
+      if (fieldsValues[columnName]) {
+        columnValue = fieldsValues[columnName];
+      }
+
+      questionMarks += "?";
+      if ((index + 1) < columns.length) {
+        columnNames += ',';
+        questionMarks += ',';
+      }
+      if (column.type != "LONGTEXT") {
+        if (columnValue == undefined) {
+          columnValue = 0;
+        }
+        values.push(columnValue);
+      } else {
+        values.push(JSON.stringify(columnValue));
+      }
+
+    });
+    let query = "INSERT OR REPLACE INTO " + tableName + " (" + columnNames + ") VALUES (" + questionMarks + ")";
+    let db = new SQLite();
+
+    return new Promise(function(resolve, reject) {
+      db.openDatabase({name: databaseName,location: 'default'}).then(() => {
+        db.executeSql(query, values).then((success) => {
+          resolve();
+        }, (err) => {
+          reject();
+        });
+      }, (err) => {
+        reject();
+      });
+    });
+  }
+
+  getDataFromTableByAttributes(tableName, attribute, attributesValuesArray,databaseName){
+    let self = this;
+    databaseName = databaseName + '.db';
+    let columns = self.dataBaseStructure[tableName].columns;
+    let query = "SELECT * FROM " + tableName + " WHERE " + attribute + " IN (";
+    let inClauseValues = "";
+
+    attributesValuesArray.forEach( (attributesValue:any, index:any)=> {
+      inClauseValues += "'" + attributesValue + "'";
+      if ((index + 1) < attributesValuesArray.length) {
+        inClauseValues += ',';
+      }
+    });
+    query += inClauseValues;
+    query += ")";
+    let db = new SQLite();
+
+    return new Promise(function(resolve, reject) {
+      db.openDatabase({name: databaseName,location: 'default'}).then(() => {
+        db.executeSql(query, []).then((result) => {
+          resolve(self.formatQueryReturnResult(result,columns));
+        }, (err) => {
+          reject();
+        });
+      }, (err) => {
+        reject();
+      });
+    });
+
+  }
+
+  getAllDataFromTable(tableName,databaseName){
+    let self = this;
+    databaseName = databaseName + '.db';
+    let columns = self.dataBaseStructure[tableName].columns;
+    let query = "SELECT * FROM " + tableName + ";";
+    let db = new SQLite();
+
+    return new Promise(function(resolve, reject) {
+      db.openDatabase({name: databaseName,location: 'default'}).then(() => {
+        db.executeSql(query, []).then((result) => {
+          resolve(self.formatQueryReturnResult(result,columns));
+        }, (err) => {
+          reject();
+        });
+      }, (err) => {
+        reject();
+      });
+    });
+
+  }
+
+  formatQueryReturnResult(result, columns){
+    let len = result.rows.length;
+    let data = [];
+
+    for (var i = 0; i < len; i++) {
+      let row = {};
+      let currentRow = result.rows.item(i);
+      columns.forEach((column) =>{
+        var columnName = column.value;
+        if (column.type != "LONGTEXT") {
+          row[columnName] = currentRow[columnName]
+        } else {
+          row[columnName] = eval("(" + currentRow[columnName] + ")");
+        }
+      });
+      data.push(row);
+    }
+    return data;
   }
 
 
