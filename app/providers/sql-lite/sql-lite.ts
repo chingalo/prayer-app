@@ -12,15 +12,32 @@ import {Observable} from 'rxjs/Rx';
 export class SqlLite {
 
   private dataBaseStructure: any= {
-    programs : {
+    dataElementGroupSets : {
       columns : [
         {value: 'id', type: 'TEXT'},
         {value: 'name', type: 'TEXT'},
-        {value: 'categoryCombo',type:'LONGTEXT'},
-        {value: 'organisationUnits',type:'LONGTEXT'},
-        {value: 'programStages',type:'LONGTEXT'}
+        {value: 'description',type:'LONGTEXT'},
+        {value: 'dataElementGroups',type:'LONGTEXT'}
       ],
-      fields : "id,name,categoryCombo[id,isDefault,categories[id,categoryOptions[id,name]]],organisationUnits[id],programStages[programStageDataElements[id,name,displayInReports,compulsory,sortOrder,dataElement[id,name,code,optionSetValue,valueType,optionSet[options[id,code,name]],categoryCombo[id,isDefault,categories[id,name]]]]]",
+      fields : "id,name,description,dataElementGroups[id,name]",
+    },
+    dataElementGroups : {
+      columns : [
+        {value: 'id', type: 'TEXT'},
+        {value: 'name', type: 'TEXT'},
+        {value: 'code', type: 'TEXT'},
+        {value: 'dataElements',type:'LONGTEXT'}
+      ],
+      fields : "id,name,code,dataElements[id,name]",
+    },
+    dataElements : {
+      columns : [
+        {value: 'id', type: 'TEXT'},
+        {value: 'name', type: 'TEXT'},
+        {value: 'description',type:'LONGTEXT'},
+        {value: 'attributeValues',type:'LONGTEXT'}
+      ],
+      fields : "id,name,description,attributeValues[value,attribute[id,name]]",
     }
   };
 
