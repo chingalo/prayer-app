@@ -19,7 +19,8 @@
 
     <ion-row>
       <ion-col class="topSLogan" width-100 >
-        <h4 secondary >{{ data.setUpTitle }}</h4>
+        <h4 secondary>{{ data.setUpTitle }}</h4>
+        <p>{{ data.setUpShortDescription }}</p>
         <!--<img [src]="data.logoUrl" >-->
       </ion-col>
 
@@ -60,13 +61,11 @@
     </ion-row>
 
     <ion-row *ngIf="!loadingData" >
-      <!--<ion-col width-5></ion-col>-->
       <ion-col width-100>
         <button (click)="loginToServer()" full secondary>
           Login
         </button>
       </ion-col>
-      <!--<ion-col width-5></ion-col>-->
     </ion-row>
   </ion-grid>
 

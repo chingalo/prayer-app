@@ -9,22 +9,44 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var http_1 = require('@angular/http');
-require('rxjs/add/operator/map');
 var ionic_angular_1 = require('ionic-angular');
+require('rxjs/add/operator/map');
+var Rx_1 = require('rxjs/Rx');
+var sql_lite_1 = require("../sql-lite/sql-lite");
 /*
-  Generated class for the App provider.
+ Generated class for the App provider.
 
-  See https://angular.io/docs/ts/latest/guide/dependency-injection.html
-  for more info on providers and Angular 2 DI.
-*/
+ See https://angular.io/docs/ts/latest/guide/dependency-injection.html
+ for more info on providers and Angular 2 DI.
+ */
 var App = (function () {
-    function App(http) {
+    function App(http, sqlLite) {
         this.http = http;
+        this.sqlLite = sqlLite;
         this.localStorage = new ionic_angular_1.Storage(ionic_angular_1.LocalStorage);
     }
     App.prototype.setCurrentUser = function (user) {
         this.localStorage.set('user', JSON.stringify(user));
         return Promise.resolve(user);
+    };
+    App.prototype.setUserData = function (userDataResponse) {
+        var userData = {
+            "Name": userDataResponse.name,
+            "Employer": userDataResponse.employer,
+            "Job Title": userDataResponse.jobTitle,
+            "Education": userDataResponse.education,
+            "Gender": userDataResponse.gender,
+            "Birthday": userDataResponse.birthday,
+            "Nationality": userDataResponse.nationality,
+            "Interests": userDataResponse.interests,
+            "userRoles": userDataResponse.userCredentials.userRoles,
+            "organisationUnits": userDataResponse.organisationUnits
+        };
+        this.localStorage.set('userData', JSON.stringify(userData));
+        return Promise.resolve(userData);
+    };
+    App.prototype.getUserData = function () {
+        return this.localStorage.get('userData');
     };
     App.prototype.getCurrentUser = function () {
         var self = this;
@@ -39,9 +61,54 @@ var App = (function () {
             });
         });
     };
+    App.prototype.getFormattedBaseUrl = function (url) {
+        this.formattedBaseUrl = "";
+        var urlToBeFormatted = "", urlArray = [], baseUrlString;
+        if (!(url.split('/')[0] == "https:" || url.split('/')[0] == "http:")) {
+            urlToBeFormatted = "http://" + url;
+        }
+        else {
+            urlToBeFormatted = url;
+        }
+        baseUrlString = urlToBeFormatted.split('/');
+        for (var index in baseUrlString) {
+            if (baseUrlString[index]) {
+                urlArray.push(baseUrlString[index]);
+            }
+        }
+        this.formattedBaseUrl = urlArray[0] + '/';
+        for (var i = 0; i < urlArray.length; i++) {
+            if (i != 0) {
+                this.formattedBaseUrl = this.formattedBaseUrl + '/' + urlArray[i];
+            }
+        }
+        return Promise.resolve(this.formattedBaseUrl);
+    };
+    App.prototype.getDataBaseName = function (url) {
+        var databaseName = url.replace('://', '_').replace('/', '_').replace('.', '_').replace(':', '_');
+        return Promise.resolve(databaseName);
+    };
+    App.prototype.saveMetadata = function (resource, resourceValues, databaseName) {
+        var promises = [];
+        var self = this;
+        return new Promise(function (resolve, reject) {
+            var counter = 1;
+            resourceValues.forEach(function (resourceValue) {
+                promises.push(self.sqlLite.insertDataOnTable(resource, resourceValue, databaseName).then(function () {
+                    //saving success
+                }, function (error) {
+                }));
+            });
+            Rx_1.Observable.forkJoin(promises).subscribe(function () {
+                resolve();
+            }, function (error) {
+                reject(error.failure);
+            });
+        });
+    };
     App = __decorate([
         core_1.Injectable(), 
-        __metadata('design:paramtypes', [http_1.Http])
+        __metadata('design:paramtypes', [http_1.Http, sql_lite_1.SqlLite])
     ], App);
     return App;
 })();
