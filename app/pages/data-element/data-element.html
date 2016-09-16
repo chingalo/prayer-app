@@ -7,12 +7,14 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>dataElement</ion-title>
+    <ion-title>{{ dataElement.name }}</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content padding class="data-element">
+
+  {{ dataElement| json}}
 
 </ion-content>

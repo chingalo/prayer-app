@@ -19,6 +19,7 @@ var MyApp = (function () {
             // Okay, so the platform is ready and our plugins are available.
             // Here you can do any higher level native things you might need.
             ionic_native_1.StatusBar.styleDefault();
+            ionic_native_1.Splashscreen.hide();
         });
     }
     MyApp = __decorate([

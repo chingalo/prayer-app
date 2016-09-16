@@ -7,12 +7,25 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>dataElementGroupsSet</ion-title>
+    <ion-title>dataElement Groups Set</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
-<ion-content padding>
+<ion-content padding class="data-element-groups-set">
+
+  <ion-list>
+    <div *ngFor="let groupSet of metaData">
+      <button ion-item (click)="goToSelectedGroupSet(groupSet)">
+        <ion-icon name="list" item-left></ion-icon>
+        <h2>{{groupSet.name}}</h2>
+        <p>{{groupSet.description}}</p>
+        <ion-icon name="arrow-round-forward" item-right></ion-icon>
+      </button>
+    </div>
+
+  </ion-list>
+
 
 </ion-content>

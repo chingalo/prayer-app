@@ -145,6 +145,7 @@ var SetupPage = (function () {
             var responseData = data.json();
             _this.setLoadingMessages('Starting saving ' + responseData[resource].length + ' data elements');
             _this.app.saveMetadata(resource, responseData[resource], _this.data.currentDataBase).then(function () {
+                _this.data.hasData = true;
                 _this.app.setCurrentUser(_this.data).then(function (user) {
                     _this.navCtrl.setRoot(data_element_groups_set_1.DataElementGroupsSetPage);
                 });

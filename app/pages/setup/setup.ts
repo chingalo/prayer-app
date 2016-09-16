@@ -149,6 +149,7 @@ export class SetupPage {
         let responseData = data.json();
         this.setLoadingMessages('Starting saving '+responseData[resource].length+' data elements');
         this.app.saveMetadata(resource,responseData[resource],this.data.currentDataBase).then(()=>{
+          this.data.hasData = true;
           this.app.setCurrentUser(this.data).then(user=>{
             this.navCtrl.setRoot(DataElementGroupsSetPage);
           })

@@ -12,72 +12,70 @@ var ionic_angular_1 = require('ionic-angular');
 var app_1 = require('../../providers/app/app');
 var http_client_1 = require('../../providers/http-client/http-client');
 var sql_lite_1 = require("../../providers/sql-lite/sql-lite");
-var data_element_groups_1 = require('../data-element-groups/data-element-groups');
+var data_element_1 = require('../data-element/data-element');
 /*
-  Generated class for the DataElementGroupsSetPage page.
+  Generated class for the DataElementListPage page.
 
   See http://ionicframework.com/docs/v2/components/#navigation for more info on
   Ionic pages and navigation.
 */
-var DataElementGroupsSetPage = (function () {
-    function DataElementGroupsSetPage(navCtrl, sqlLite, httpClient, app, toastCtrl) {
+var DataElementListPage = (function () {
+    function DataElementListPage(params, navCtrl, sqlLite, httpClient, app, toastCtrl) {
         var _this = this;
+        this.params = params;
         this.navCtrl = navCtrl;
         this.sqlLite = sqlLite;
         this.httpClient = httpClient;
         this.app = app;
         this.toastCtrl = toastCtrl;
-        this.resource = "dataElementGroupSets";
+        this.resource = "dataElements";
         this.currentUser = {};
+        this.groupName = this.params.get('groupName');
+        this.dataElementsId = this.params.get('dataElementsId');
         this.app.getCurrentUser().then(function (currentUser) {
             _this.currentUser = currentUser;
             _this.loadingMetaData();
         });
     }
-    DataElementGroupsSetPage.prototype.loadingMetaData = function () {
+    DataElementListPage.prototype.loadingMetaData = function () {
         var _this = this;
         var databaseName = this.currentUser.currentDataBase;
-        this.sqlLite.getAllDataFromTable(this.resource, databaseName).then(function (data) {
+        this.sqlLite.getDataFromTableByAttributes(this.resource, 'id', this.dataElementsId, databaseName).then(function (data) {
             _this.setMetadata(data);
         }, function (error) {
             _this.setToasterMessage('Fail to load data from local storage');
         });
     };
-    DataElementGroupsSetPage.prototype.setMetadata = function (data) {
+    DataElementListPage.prototype.setMetadata = function (data) {
         this.metaData = data;
     };
-    DataElementGroupsSetPage.prototype.goToSelectedGroupSet = function (groupSet) {
-        var dataElementGroupsId = [];
-        groupSet.dataElementGroups.forEach(function (dataElementGroup) {
-            dataElementGroupsId.push(dataElementGroup.id);
-        });
+    DataElementListPage.prototype.goToSelectedDataElement = function (dataElement) {
         var parameters = {
-            groupSetName: groupSet.name,
-            dataElementGroupsId: dataElementGroupsId
+            dataElement: dataElement
         };
-        this.navCtrl.push(data_element_groups_1.DataElementGroupsPage, parameters);
+        this.navCtrl.push(data_element_1.DataElementPage, parameters);
     };
-    DataElementGroupsSetPage.prototype.setToasterMessage = function (message) {
+    DataElementListPage.prototype.setToasterMessage = function (message) {
         var toast = this.toastCtrl.create({
             message: message,
             duration: 4000
         });
         toast.present();
     };
-    DataElementGroupsSetPage.prototype.setStickToasterMessage = function (message) {
+    DataElementListPage.prototype.setStickToasterMessage = function (message) {
         var toast = this.toastCtrl.create({
             message: message,
             showCloseButton: true
         });
         toast.present();
     };
-    DataElementGroupsSetPage = __decorate([
+    DataElementListPage = __decorate([
         core_1.Component({
-            templateUrl: 'build/pages/data-element-groups-set/data-element-groups-set.html',
+            templateUrl: 'build/pages/data-element-list/data-element-list.html',
             providers: [app_1.App, http_client_1.HttpClient, sql_lite_1.SqlLite]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, sql_lite_1.SqlLite, http_client_1.HttpClient, app_1.App, ionic_angular_1.ToastController])
-    ], DataElementGroupsSetPage);
-    return DataElementGroupsSetPage;
+        __metadata('design:paramtypes', [ionic_angular_1.NavParams, ionic_angular_1.NavController, sql_lite_1.SqlLite, http_client_1.HttpClient, app_1.App, ionic_angular_1.ToastController])
+    ], DataElementListPage);
+    return DataElementListPage;
 })();
-exports.DataElementGroupsSetPage = DataElementGroupsSetPage;
+exports.DataElementListPage = DataElementListPage;
