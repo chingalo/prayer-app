@@ -9,25 +9,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
-var ionic_native_1 = require('ionic-native');
-var setup_1 = require("./pages/setup/setup");
-var MyApp = (function () {
-    function MyApp(platform) {
-        this.platform = platform;
-        this.rootPage = setup_1.SetupPage;
-        platform.ready().then(function () {
-            // Okay, so the platform is ready and our plugins are available.
-            // Here you can do any higher level native things you might need.
-            ionic_native_1.StatusBar.styleDefault();
-        });
+/*
+  Generated class for the DataElementGroupsPage page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+*/
+var DataElementGroupsPage = (function () {
+    function DataElementGroupsPage(navCtrl) {
+        this.navCtrl = navCtrl;
     }
-    MyApp = __decorate([
+    DataElementGroupsPage = __decorate([
         core_1.Component({
-            template: '<ion-nav [root]="rootPage"></ion-nav>'
+            templateUrl: 'build/pages/data-element-groups/data-element-groups.html',
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.Platform])
-    ], MyApp);
-    return MyApp;
+        __metadata('design:paramtypes', [ionic_angular_1.NavController])
+    ], DataElementGroupsPage);
+    return DataElementGroupsPage;
 })();
-exports.MyApp = MyApp;
-ionic_angular_1.ionicBootstrap(MyApp);
+exports.DataElementGroupsPage = DataElementGroupsPage;
