@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var ionic_angular_1 = require('ionic-angular');
 var app_1 = require('../../providers/app/app');
+var data_element_groups_set_1 = require('../data-element-groups-set/data-element-groups-set');
 /*
   Generated class for the SetupPage page.
 
@@ -18,6 +19,7 @@ var app_1 = require('../../providers/app/app');
 */
 var SetupPage = (function () {
     function SetupPage(navCtrl, toastCtrl, app) {
+        var _this = this;
         this.navCtrl = navCtrl;
         this.toastCtrl = toastCtrl;
         this.app = app;
@@ -26,15 +28,24 @@ var SetupPage = (function () {
         this.loadingData = false;
         this.data.setUpTitle = "Prayer App 1.0";
         //this.data.logoUrl = 'img/prayer.jpg';
-        this.reAuthenticateUser();
-    }
-    SetupPage.prototype.reAuthenticateUser = function () {
-        this.setToasterMessage('reAuthenticateUser');
         this.app.getCurrentUser().then(function (user) {
             console.log(user);
+            _this.reAuthenticateUser(user);
         });
+    }
+    SetupPage.prototype.reAuthenticateUser = function (user) {
+        if (user.hasData) {
+            this.navCtrl.setRoot(data_element_groups_set_1.DataElementGroupsSetPage);
+        }
+        else if (user.serverUrl) {
+            this.data.serverUrl = user.serverUrl;
+            if (user.username) {
+                this.data.username = user.username;
+            }
+        }
     };
     SetupPage.prototype.loginToServer = function () {
+        this.data.hasData = true;
         this.app.setCurrentUser(this.data).then(function (user) {
             console.log(user);
         });

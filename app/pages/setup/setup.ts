@@ -3,6 +3,8 @@ import { NavController,ToastController } from 'ionic-angular';
 
 import { App } from '../../providers/app/app';
 
+import {DataElementGroupsSetPage} from '../data-element-groups-set/data-element-groups-set';
+
 /*
   Generated class for the SetupPage page.
 
@@ -23,19 +25,25 @@ export class SetupPage {
     this.loadingData = false;
     this.data.setUpTitle = "Prayer App 1.0";
     //this.data.logoUrl = 'img/prayer.jpg';
-    this.reAuthenticateUser();
-  }
-
-  reAuthenticateUser(){
-    this.setToasterMessage('reAuthenticateUser');
     this.app.getCurrentUser().then(user=>{
       console.log(user);
+      this.reAuthenticateUser(user);
     })
+  }
 
+  reAuthenticateUser(user){
+    if(user.hasData){
+      this.navCtrl.setRoot(DataElementGroupsSetPage);
+    }else if(user.serverUrl){
+      this.data.serverUrl = user.serverUrl;
+      if(user.username){
+        this.data.username = user.username;
+      }
+    }
   }
 
   loginToServer(){
-
+    this.data.hasData = true;
     this.app.setCurrentUser(this.data).then(user=>{
       console.log(user);
     })
