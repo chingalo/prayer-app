@@ -13,6 +13,7 @@ var app_1 = require('../../providers/app/app');
 var http_client_1 = require('../../providers/http-client/http-client');
 var sql_lite_1 = require("../../providers/sql-lite/sql-lite");
 var data_element_groups_1 = require('../data-element-groups/data-element-groups');
+var data_element_list_1 = require("../data-element-list/data-element-list");
 /*
   Generated class for the DataElementGroupsSetPage page.
 
@@ -44,7 +45,39 @@ var DataElementGroupsSetPage = (function () {
         });
     };
     DataElementGroupsSetPage.prototype.setMetadata = function (data) {
+        if (data.length > 0) {
+            this.currentGroupSet = data[0].id;
+        }
         this.metaData = data;
+    };
+    DataElementGroupsSetPage.prototype.showSegment = function (currentGroupId) {
+        this.currentGroupSet = currentGroupId;
+    };
+    DataElementGroupsSetPage.prototype.goToSelectedGroup = function (group) {
+        this.loadingSelectedGroupMetadata(group);
+    };
+    DataElementGroupsSetPage.prototype.loadingSelectedGroupMetadata = function (group) {
+        var _this = this;
+        var databaseName = this.currentUser.currentDataBase;
+        var attributeValue = [];
+        attributeValue.push(group.id);
+        this.sqlLite.getDataFromTableByAttributes('dataElementGroups', 'id', attributeValue, databaseName).then(function (metaData) {
+            _this.setSelectedGroupMetadata(metaData);
+        }, function (error) {
+            _this.setToasterMessage('Fail to load data from local storage');
+        });
+    };
+    DataElementGroupsSetPage.prototype.setSelectedGroupMetadata = function (metaData) {
+        var group = metaData[0];
+        var dataElementsId = [];
+        group.dataElements.forEach(function (dataElement) {
+            dataElementsId.push(dataElement.id);
+        });
+        var parameters = {
+            groupName: group.name,
+            dataElementsId: dataElementsId
+        };
+        this.navCtrl.push(data_element_list_1.DataElementListPage, parameters);
     };
     DataElementGroupsSetPage.prototype.goToSelectedGroupSet = function (groupSet) {
         var dataElementGroupsId = [];
