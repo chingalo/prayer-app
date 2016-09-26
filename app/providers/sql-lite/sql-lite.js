@@ -41,10 +41,9 @@ var SqlLite = (function () {
                 columns: [
                     { value: 'id', type: 'TEXT' },
                     { value: 'name', type: 'TEXT' },
-                    { value: 'description', type: 'LONGTEXT' },
-                    { value: 'attributeValues', type: 'LONGTEXT' }
+                    { value: 'description', type: 'LONGTEXT' }
                 ],
-                fields: "id,name,description,attributeValues[value,attribute[id,name]]",
+                fields: "id,name,description",
             }
         };
     }

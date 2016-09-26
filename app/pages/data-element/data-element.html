@@ -15,6 +15,15 @@
 
 <ion-content padding class="data-element">
 
-  {{ dataElement| json}}
+  <ion-card>
+    <ion-card-content>
+      <ion-card-title>
+        {{ dataElement.name }}
+      </ion-card-title>
+
+      <div [innerHTML]="dataElement.description"></div>
+      
+    </ion-card-content>
+  </ion-card>
 
 </ion-content>
