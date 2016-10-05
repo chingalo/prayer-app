@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController,ToastController } from 'ionic-angular';
+import { NavController,ToastController,ViewController,PopoverController } from 'ionic-angular';
 
 import { App } from '../../providers/app/app';
 import {HttpClient} from '../../providers/http-client/http-client';
@@ -7,6 +7,29 @@ import {SqlLite} from "../../providers/sql-lite/sql-lite";
 
 import {DataElementGroupsPage} from '../data-element-groups/data-element-groups';
 import {DataElementListPage} from "../data-element-list/data-element-list";
+
+@Component({
+  template: `
+    <ion-list>
+      <button ion-item (click)="updateData()">Update</button>
+      <button ion-item (click)="logOut()">Log out</button>
+    </ion-list>
+  `
+})
+
+class PopoverPage {
+
+  constructor(public viewCtrl: ViewController) { }
+
+  updateData() {
+    alert('Read to update data');
+    this.viewCtrl.dismiss();
+  }
+  logOut(){
+    alert('Ready to log out');
+    this.viewCtrl.dismiss();
+  }
+}
 
 /*
   Generated class for the DataElementGroupsSetPage page.
@@ -25,11 +48,17 @@ export class DataElementGroupsSetPage {
   private metaData : any [];
   private currentGroupSet : string;
 
-  constructor(private navCtrl: NavController,private sqlLite : SqlLite,private httpClient: HttpClient,private app : App,private toastCtrl: ToastController) {
+  constructor(private popoverCtrl: PopoverController,private navCtrl: NavController,private sqlLite : SqlLite,private httpClient: HttpClient,private app : App,private toastCtrl: ToastController) {
     this.app.getCurrentUser().then(currentUser=>{
       this.currentUser = currentUser;
       this.loadingMetaData()
     })
+  }
+
+
+  presentPopover(event) {
+    let popover = this.popoverCtrl.create(PopoverPage);
+    popover.present({ ev: event });
   }
 
   loadingMetaData(){

@@ -1,11 +1,34 @@
 import { Component } from '@angular/core';
-import { NavController,ToastController,NavParams } from 'ionic-angular';
+import { NavController,ToastController,NavParams ,ViewController,PopoverController} from 'ionic-angular';
 
 import { App } from '../../providers/app/app';
 import {HttpClient} from '../../providers/http-client/http-client';
 import {SqlLite} from "../../providers/sql-lite/sql-lite";
 
-import {DataElementPage} from '../data-element/data-element'
+import {DataElementPage} from '../data-element/data-element';
+
+@Component({
+  template: `
+    <ion-list>
+      <button ion-item (click)="updateData()">Update</button>
+      <button ion-item (click)="logOut()">Log out</button>
+    </ion-list>
+  `
+})
+
+class PopoverPage {
+
+  constructor(public viewCtrl: ViewController) { }
+
+  updateData() {
+    alert('Read to update data');
+    this.viewCtrl.dismiss();
+  }
+  logOut(){
+    alert('Ready to log out');
+    this.viewCtrl.dismiss();
+  }
+}
 
 /*
   Generated class for the DataElementListPage page.
@@ -25,7 +48,7 @@ export class DataElementListPage {
   private groupName : string;
   private dataElementsId : Array<any>;
 
-  constructor(private params: NavParams,private navCtrl: NavController,private sqlLite : SqlLite,private httpClient: HttpClient,private app : App,private toastCtrl: ToastController) {
+  constructor(private popoverCtrl: PopoverController,private params: NavParams,private navCtrl: NavController,private sqlLite : SqlLite,private httpClient: HttpClient,private app : App,private toastCtrl: ToastController) {
     this.groupName = this.params.get('groupName');
     this.dataElementsId = this.params.get('dataElementsId');
     this.app.getCurrentUser().then(currentUser=>{
@@ -34,6 +57,11 @@ export class DataElementListPage {
     })
   }
 
+
+  presentPopover(event) {
+    let popover = this.popoverCtrl.create(PopoverPage);
+    popover.present({ ev: event });
+  }
 
   loadingMetaData(){
     let databaseName = this.currentUser.currentDataBase;

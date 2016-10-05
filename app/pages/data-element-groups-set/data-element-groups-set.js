@@ -14,6 +14,26 @@ var http_client_1 = require('../../providers/http-client/http-client');
 var sql_lite_1 = require("../../providers/sql-lite/sql-lite");
 var data_element_groups_1 = require('../data-element-groups/data-element-groups');
 var data_element_list_1 = require("../data-element-list/data-element-list");
+var PopoverPage = (function () {
+    function PopoverPage(viewCtrl) {
+        this.viewCtrl = viewCtrl;
+    }
+    PopoverPage.prototype.updateData = function () {
+        alert('Read to update data');
+        this.viewCtrl.dismiss();
+    };
+    PopoverPage.prototype.logOut = function () {
+        alert('Ready to log out');
+        this.viewCtrl.dismiss();
+    };
+    PopoverPage = __decorate([
+        core_1.Component({
+            template: "\n    <ion-list>\n      <button ion-item (click)=\"updateData()\">Update</button>\n      <button ion-item (click)=\"logOut()\">Log out</button>\n    </ion-list>\n  "
+        }), 
+        __metadata('design:paramtypes', [ionic_angular_1.ViewController])
+    ], PopoverPage);
+    return PopoverPage;
+})();
 /*
   Generated class for the DataElementGroupsSetPage page.
 
@@ -21,8 +41,9 @@ var data_element_list_1 = require("../data-element-list/data-element-list");
   Ionic pages and navigation.
 */
 var DataElementGroupsSetPage = (function () {
-    function DataElementGroupsSetPage(navCtrl, sqlLite, httpClient, app, toastCtrl) {
+    function DataElementGroupsSetPage(popoverCtrl, navCtrl, sqlLite, httpClient, app, toastCtrl) {
         var _this = this;
+        this.popoverCtrl = popoverCtrl;
         this.navCtrl = navCtrl;
         this.sqlLite = sqlLite;
         this.httpClient = httpClient;
@@ -35,6 +56,10 @@ var DataElementGroupsSetPage = (function () {
             _this.loadingMetaData();
         });
     }
+    DataElementGroupsSetPage.prototype.presentPopover = function (event) {
+        var popover = this.popoverCtrl.create(PopoverPage);
+        popover.present({ ev: event });
+    };
     DataElementGroupsSetPage.prototype.loadingMetaData = function () {
         var _this = this;
         var databaseName = this.currentUser.currentDataBase;
@@ -109,7 +134,7 @@ var DataElementGroupsSetPage = (function () {
             templateUrl: 'build/pages/data-element-groups-set/data-element-groups-set.html',
             providers: [app_1.App, http_client_1.HttpClient, sql_lite_1.SqlLite]
         }), 
-        __metadata('design:paramtypes', [ionic_angular_1.NavController, sql_lite_1.SqlLite, http_client_1.HttpClient, app_1.App, ionic_angular_1.ToastController])
+        __metadata('design:paramtypes', [ionic_angular_1.PopoverController, ionic_angular_1.NavController, sql_lite_1.SqlLite, http_client_1.HttpClient, app_1.App, ionic_angular_1.ToastController])
     ], DataElementGroupsSetPage);
     return DataElementGroupsSetPage;
 })();
